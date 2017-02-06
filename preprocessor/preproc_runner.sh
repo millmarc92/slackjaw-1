@@ -5,6 +5,7 @@
 # identify the archive for that customer
 
 scriptname=$0
+scriptsdir="`dirname \"$0\"`"
 archive_in=$1
 cust_id=$2
 mode=$3
