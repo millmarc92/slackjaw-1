@@ -6,7 +6,7 @@
 
 scriptname=$0
 scriptsdir="`dirname \"$0\"`"
-archive_in=$1
+archive_in=`echo "$1" | tr " " "_"`
 cust_id=$2
 mode=$3
 if [ "$mode " != "debug " ]; then
@@ -18,7 +18,7 @@ fi
 
 # check if we have an actual readable file from the customer
 invalidchar_in_archive=`echo "$archive_in" | grep "[^a-zA-Z0-9_.-]"`
-if [ "$archive_in " == " " ]
+if [ "$1 " == " " ]
 then
   echo "ERROR: no archive specified"
   exit 1
@@ -26,15 +26,23 @@ elif [ "$invalidchar_in_archive " != " " ]
 then
   echo "ERROR: invalid characters in filename:$archive_in"
   exit 2
-elif [ ! -f $archive_in ]
+elif [ ! -f "$1" ]
 then
-  echo "ERROR: $archive_in is not a file"
+  echo "ERROR: $1 is not a file"
   exit 3
-elif [ ! -r $archive_in ]
+elif [ ! -r "$1" ]
 then
-  echo "ERROR: $archive_in is not readable"
+  echo "ERROR: $1 is not readable"
   exit 4
+else
+  mv "$1" $archive_in
+  if [ $? -ne 0 ]
+  then
+    echo "ERROR: cannot rename $1 to $archive_in"
+    exit 11
+  fi
 fi
+
 function abspath() {
     if [ -d "$1" ]; then
         (cd "$1"; pwd)
@@ -115,6 +123,7 @@ isbzip(){
 }
 
 load_if_valid_archive(){
+  echo "test"
   if iszip || isgzip || isbzip
   then
     load_customer
@@ -140,6 +149,7 @@ load_customer(){
     tar jxvf $archive_file
   fi
   if [ $? -ne 0 ]
+  then
     echo "ERROR: unable to decompress $archive_file to $cust_id"
     exit 10
   fi
