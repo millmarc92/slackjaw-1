@@ -4,6 +4,7 @@
 # The optional second argument is the customer identifier (whatever it is) used to uniquely
 # identify the archive for that customer
 
+
 function abspath() {
     if [ -d "$1" ]; then
         (cd "$1"; pwd)
@@ -207,3 +208,4 @@ find_channels(){
 load_if_valid_archive # always do
 set_source_dirs #always do
 run_script_parser #will change w/backend
+
