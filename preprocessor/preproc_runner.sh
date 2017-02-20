@@ -4,8 +4,23 @@
 # The optional second argument is the customer identifier (whatever it is) used to uniquely
 # identify the archive for that customer
 
+
+function abspath() {
+    if [ -d "$1" ]; then
+        (cd "$1"; pwd)
+    elif [ -f "$1" ]; then
+        if [[ $1 == */* ]]; then
+            echo "$(cd "${1%/*}"; pwd)/${1##*/}"
+        else
+            echo "$(pwd)/$1"
+        fi
+    fi
+}
+
 scriptname=$0
-scriptsdir="`dirname \"$0\"`"
+relscriptsdir="`dirname \"$0\"`"
+scriptsdir=`abspath $relscriptsdir`
+preproc="slack_parser.sh"
 archive_in=`echo "$1" | tr " " "_"`
 cust_id=$2
 mode=$3
@@ -43,17 +58,6 @@ else
   fi
 fi
 
-function abspath() {
-    if [ -d "$1" ]; then
-        (cd "$1"; pwd)
-    elif [ -f "$1" ]; then
-        if [[ $1 == */* ]]; then
-            echo "$(cd "${1%/*}"; pwd)/${1##*/}"
-        else
-            echo "$(pwd)/$1"
-        fi
-    fi
-}
 archive_file=$(abspath ${archive_in})
 
 # check if we can actually have a customer directory to receive decompressed
@@ -74,6 +78,8 @@ then
   then
     echo "ERROR: unable to create a directory for $cust_id"
     exit 7
+  else
+    cust_dir="`pwd`/$cust_id"
   fi
 fi
 
@@ -123,7 +129,6 @@ isbzip(){
 }
 
 load_if_valid_archive(){
-  echo "test"
   if iszip || isgzip || isbzip
   then
     load_customer
@@ -137,7 +142,7 @@ load_if_valid_archive(){
 # could take a while to fail for, say, a truncated archive, or running out of
 # disk space.
 load_customer(){
-  cd $cust_id
+  cd $cust_dir
   if iszip
   then
     unzip $archive_file
@@ -154,5 +159,53 @@ load_customer(){
     exit 10
   fi
 }
-load_if_valid_archive
-#TODO: execute preproc
+
+# finds and cleans all the source dirs. By default, zip uploads will only
+# contain one slack archive, but this function means that they can upload
+# archive files containing multiple slack archives and we can handle them all.
+# The archives can't be nested, however; they should be siblings
+arch_paths=() # creating as global variable for set_source_dirs() to set
+set_source_dirs(){
+  OIFS=$IFS
+  IFS=$'\n'
+  # arch_paths[0] holds the holds the final array index
+  arch_paths=( `find $(pwd) -name "users.json" |awk '{ent= ent "\n" substr($0,1,(length($0) - 10))} END {print NR "\n" ent}'` )
+  IFS=$OIFS
+  # cycle through and clean up any directories with spaces, which can cause
+  # problems for other tools/utilities/whatever.
+  for i in `seq 1 ${arch_paths[0]}`
+  do
+    startpath=${arch_paths[${i}]}
+    cleanpath=`echo "$startpath" | tr " " "_"`
+    if [ "$startpath " != "$cleanpath " ]
+    then # need to clean up spaces
+      mv "$startpath" $cleanpath
+      if [ $? -ne 0 ]
+      then
+        echo "ERROR: unable to mv customer archive from \"$startpath\" to \"$cleanpath\""
+        exit 12
+      fi
+      arch_paths[${i}]="$cleanpath"
+    fi #if [ "$startpath " != "$cleanpath " ]
+  done #for (i=1; i<=${arch_paths[0]}; i++)
+}
+#MVP script=based parser, to be replaced w/batabase or whatever
+channel_list=""
+run_script_parser(){
+  for i in `seq 1 ${arch_paths[0]}`
+  do
+    find_channels `echo ${arch_paths[${i}]} | awk '{print substr($0,1,(length($0) - 1))}'`
+  done
+  cd $cust_dir # make sure we're in the customer dir, so the 'parsed' dirs ends up where expected.
+  ${scriptsdir}/${preproc} $channel_list
+}
+find_channels(){
+  channel_list="$channel_list `find $1 -type d`"
+}
+
+
+#TODO: check for space handling with alternate formats
+load_if_valid_archive # always do
+set_source_dirs #always do
+run_script_parser #will change w/backend
+

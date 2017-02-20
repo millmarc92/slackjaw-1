@@ -37,7 +37,7 @@ interleave_days(){
     do
       for day in $(seq -w 01 31)
       do
-        files=`find $outdir -name "${year}-${month}-${day}.*.csv"`
+        files=`find $outdir -name "${year}-${month}-${day}:*.csv"`
         if [ "$files " != " " ]; then
           cat $files |sort > ${outdir}/${year}-${month}-${day}.csv
         fi
@@ -53,8 +53,9 @@ do
     for dayfile in `ls $indir/*.json`
     do
       dayfile=`basename $dayfile`
-      echo "" > $outdir/${dayfile%.json}.$indir.csv #clear out anything that's there w/o needing to delete
-      grep -A 4 "\"type\": \"message\"," $indir/$dayfile | awk -v src_chan=$indir '$1=="\"user\":" {split($2,a,"\""); user=a[2]}$1=="\"text\":" {split($0,a,": "); text=a[2]; sub(/,$/,"",text)}$1=="\"ts\":" {split($2,a,"\""); timestamp=a[2]; print timestamp","user","src_chan","text}' >> $outdir/${dayfile%.json}.$indir.csv
+      channel_name=`echo $indir | awk '{dirdepth=split($0,a,"/"); print a[dirdepth-1]":"a[dirdepth]}'`
+      echo "" > $outdir/${dayfile%.json}:$channel_name.csv #clear out anything that's there w/o needing to delete
+      grep -A 4 "\"type\": \"message\"," $indir/$dayfile | awk -v src_chan=$channel_name '$1=="\"user\":" {split($2,a,"\""); user=a[2]}$1=="\"text\":" {split($0,a,": "); text=a[2]; sub(/,$/,"",text)}$1=="\"ts\":" {split($2,a,"\""); timestamp=a[2]; print timestamp","user","src_chan","text}' >> $outdir/${dayfile%.json}:$channel_name.csv
     done
   else
     echo "$indir is not a readable directory;skipping"
