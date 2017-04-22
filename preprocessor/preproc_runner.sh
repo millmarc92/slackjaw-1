@@ -50,7 +50,6 @@ then
   echo "ERROR: $1 is not readable"
   exit 4
 else
-  echo $archive_in
   mv "$1" $archive_in
   if [ $? -ne 0 ]
   then
