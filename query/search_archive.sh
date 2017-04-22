@@ -94,7 +94,7 @@ mvp_parser_setup(){
   fi
 }
 search_all_terms(){
-  search_cmd="grep \"${query_array[1]}\" ${parsed}/*"
+  search_cmd="grep \"${query_array[1]}\" ${parsed}/????-??-??.csv*"
   if [ $query_string_num -gt 1 ]
   then
     for i in `seq 2 $query_string_num`

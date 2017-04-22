@@ -50,6 +50,7 @@ then
   echo "ERROR: $1 is not readable"
   exit 4
 else
+  echo $archive_in
   mv "$1" $archive_in
   if [ $? -ne 0 ]
   then
@@ -78,10 +79,9 @@ then
   then
     echo "ERROR: unable to create a directory for $cust_id"
     exit 7
-  else
-    cust_dir="`pwd`/$cust_id"
   fi
 fi
+cust_dir="`pwd`/$cust_id"
 
 if [ ! -w $cust_id ]
 then
@@ -208,4 +208,3 @@ find_channels(){
 load_if_valid_archive # always do
 set_source_dirs #always do
 run_script_parser #will change w/backend
-
