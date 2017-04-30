@@ -1,0 +1,150 @@
+
+body{
+	background: #FFF;
+	background: -webkit-linear-gradient(#4f4656, #FFF);
+	background:    -moz-linear-gradient(#4f4656, #FFF);
+	background:         linear-gradient(#4f4656, #FFF);
+	background-repeat:no-repeat;
+	font-family: Helvetica, Arial, sans-serif;
+
+}
+
+A{
+	color: white;
+	text-decoration: none;
+}
+
+h1, h2, h3, h4 {
+	margin: 0;
+}
+
+#container{
+	background-color: #FAF2FF;
+	width: 900px;
+	margin-top: 60px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#header {
+	background-color: #181719;
+	color: white;
+	font-size: 25px;
+	margin:0;
+	position: fixed;
+	height: 60px;
+	top: 0;
+	left: 0;
+	right: 0;
+	text-align: center;
+}
+
+#headcontainer {
+	height: 100%;
+	width: 250px;
+	margin: 0 auto;
+	padding-left: 25px;
+
+}
+
+#logo {
+	height: 100%;
+	width: 100%;
+}​
+
+#header .text {
+	
+}
+
+#header .menu {
+	
+} 
+
+#title {
+	background-color: #333;
+	color: red;
+	text-align: center;
+	padding: 10px;
+}
+
+#content {
+	padding-left: 0, 10px, 10px, 10px;	
+}
+
+#upload {
+	width: 200px;
+	float: left;
+	background-color: gray;
+	color: white;
+}
+
+#upload .title {
+	padding: 5px;
+	text-align: center;
+	font-size: 20px;
+	background-color: #1e1b23;
+	height: 30px;
+}
+
+#upload .fileuploadholder {
+
+    width:auto;
+    height:auto;
+	margin-left: auto;
+	margin-right: auto;
+    background-color: gray;
+    border:1px solid #CCC;
+    padding:6px;
+	text-align: left;
+}
+
+#main {
+	width: 680px;
+	float: right;
+	color: black;
+	padding: 10px 5px 10px 5px;
+	background-color: #FAF2FF;
+}
+
+#nav {
+	width: 898px;
+	float: left;
+	background-color: gray;
+	color: white;
+	margin-left:-214px;
+}
+
+#nav .title{
+	padding: 5px;
+	text-align: center;
+	font-size: 25px;
+	background-color: #1e1b23;
+	height: 35px;
+}
+
+#nav .selected{
+	font-weight: bold
+}
+
+#nav ul {
+	list-style-type: none;
+	padding: 5px
+}
+
+#nav .formWrapper {
+	padding:6px;
+}
+
+#searchbar {
+	float: left;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#footer {
+	clear: both;
+	padding: 10px;
+	background-color: black;
+	color: white;
+	text-align: right;
+}
